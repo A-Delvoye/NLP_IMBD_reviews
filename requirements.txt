@@ -1,0 +1,4 @@
+kagglehub
+inflect
+nltk
+string
