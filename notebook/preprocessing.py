@@ -1,3 +1,4 @@
+#region imports
 import kagglehub
 import pandas as pd
 import os
@@ -11,13 +12,23 @@ from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import word_tokenize
 
-path = kagglehub.dataset_download("lakshmi25npathi/imdb-dataset-of-50k-movie-reviews")
+#region ntlk downloads
+nltk.download('punkt')
+nltk.download('stopwords')
 
+#region Loading data from kagglehub...
+path = kagglehub.dataset_download("lakshmi25npathi/imdb-dataset-of-50k-movie-reviews")
 print("Path to dataset files:", path)
 
 file_path = os.path.join(path, "IMDB Dataset.csv")
 df = pd.read_csv(file_path)
 
+#region Global initializations
+stop_words = set(stopwords.words("english"))
+stemmer = PorterStemmer()
+p = inflect.engine()
+
+#region show Dataframe
 print(df.head())
 reviews = df['review'].head(10)
 
@@ -26,8 +37,9 @@ for review in reviews:
 
 test = reviews[0]
 
+#region Functions
 
-# Convert to lowercase
+# 1. Convert to lowercase
 def text_lowercase(text):
     return text.lower()
 
@@ -35,7 +47,7 @@ test = text_lowercase(test)
 print(' ')
 print(f"lowercase : {test}")
 
-# Remove punctuation
+# 2. Remove punctuation
 def remove_punctuation(text):
     translator = str.maketrans('', '', string.punctuation)
     return text.translate(translator)
@@ -44,9 +56,7 @@ test = remove_punctuation(test)
 print(' ')
 print(f"remove punctuation : {test}")
 
-# convert numbers into letters
-p = inflect.engine()
-
+# 3. Convert numbers into letters
 def convert_number(text):
     temp_str = text.split()
     new_string = []
@@ -66,11 +76,7 @@ test = convert_number(test)
 print(' ')
 print(f"convert numbers : {test}")
 
-# remove stopwords
-nltk.download('punkt_tab')
-nltk.download('stopwords')
-
-
+# 4. remove stopwords
 def remove_stopwords(text):
     stop_words = set(stopwords.words("english"))
     word_tokens = word_tokenize(text)
@@ -81,10 +87,7 @@ test = remove_stopwords(test)
 print(' ')
 print(f"remove stopwords : {test}")
 
-# stemming
-
-stemmer = PorterStemmer()
-
+# 5. Stemming
 def stem_words(text):
     stems = [stemmer.stem(word) for word in text]
     return stems
@@ -95,7 +98,7 @@ print(f"Stemming : {test}")
 
 
 
-#Pipeline complet sur une seule critique
+#region Pipeline complète
 def preprocess_review(text):
     text = text_lowercase(text)
     text = remove_punctuation(text)
@@ -104,20 +107,16 @@ def preprocess_review(text):
     stems = stem_words(tokens)
     return ' '.join(stems)
 
-# Application à tout le DataFrame
+
+#__________________________________________________________________
+
+# Application de la pipe
 print("Prétraitement en cours...")
 df_test = df
 
 df_test["processed_review"] = df_test["review"].apply(preprocess_review)
 
-# df_save = df["processed_review"]
-print('*******')
-print(df_test)
-
-
-
-
-# Sauvegarde
+# Sauvegarde des données et export dans Dossier "data"
 output_dir= "data"
 os.makedirs(output_dir, exist_ok=True)
 output_path = os.path.join(output_dir, "preprocessed.csv")
