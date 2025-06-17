@@ -2,3 +2,5 @@ kagglehub
 inflect
 nltk
 string
+emojis
+vaderSentiment
