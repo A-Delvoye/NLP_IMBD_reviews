@@ -4,3 +4,4 @@ nltk
 string
 emojis
 vaderSentiment
+scikit-learn

@@ -29,13 +29,13 @@ stemmer = PorterStemmer()
 p = inflect.engine()
 
 #region show Dataframe
-print(df.head())
-reviews = df['review'].head(10)
+# print(df.head())
+# reviews = df['review'].head(10)
 
-for review in reviews:
-    print(review)
+# for review in reviews:
+#     print(review)
 
-test = reviews[0]
+# test = reviews[0]
 
 #region Functions
 
@@ -43,18 +43,10 @@ test = reviews[0]
 def text_lowercase(text):
     return text.lower()
 
-test = text_lowercase(test)
-print(' ')
-print(f"lowercase : {test}")
-
 # 2. Remove punctuation
 def remove_punctuation(text):
     translator = str.maketrans('', '', string.punctuation)
     return text.translate(translator)
-
-test = remove_punctuation(test)
-print(' ')
-print(f"remove punctuation : {test}")
 
 # 3. Convert numbers into letters
 def convert_number(text):
@@ -72,10 +64,6 @@ def convert_number(text):
     temp_str = ' '.join(new_string)
     return temp_str
 
-test = convert_number(test)
-print(' ')
-print(f"convert numbers : {test}")
-
 # 4. remove stopwords
 def remove_stopwords(text):
     stop_words = set(stopwords.words("english"))
@@ -83,20 +71,10 @@ def remove_stopwords(text):
     filtered_text = [word for word in word_tokens if word not in stop_words]
     return filtered_text
 
-test = remove_stopwords(test)
-print(' ')
-print(f"remove stopwords : {test}")
-
 # 5. Stemming
 def stem_words(text):
     stems = [stemmer.stem(word) for word in text]
     return stems
-
-test = stem_words(test)
-print(' ')
-print(f"Stemming : {test}")
-
-
 
 #region Pipeline complète
 def preprocess_review(text):
@@ -112,7 +90,7 @@ def preprocess_review(text):
 
 # Application de la pipe
 print("Prétraitement en cours...")
-df_test = df
+df_test = df.head(10)
 
 df_test["processed_review"] = df_test["review"].apply(preprocess_review)
 
@@ -124,4 +102,20 @@ df_test['processed_review'].to_csv(output_path, index=False)
 
 print(f"Prétraitement terminé. Fichier sauvegardé : {output_path}")
 
+
+#_______________________________________________________________
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Initialiser le vectorizer
+vectorizer = CountVectorizer()
+
+# Appliquer sur les reviews prétraitées
+X_bow = vectorizer.fit_transform(df_test["processed_review"])
+
+# Optionnel : convertir en DataFrame lisible
+bow_df = pd.DataFrame(X_bow.toarray(), columns=vectorizer.get_feature_names_out())
+
+# Afficher un extrait du BoW
+print(bow_df.head())
 
